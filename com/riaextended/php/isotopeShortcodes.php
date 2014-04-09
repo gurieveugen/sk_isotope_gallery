@@ -47,7 +47,7 @@ class rxIsotopeShortcodes{
 				$label_all           = $gallery_extra_data[0]['label_all'];														
 				$lightbox            = $gallery_extra_data[0]['lightbox'];
 				$api_key             = $gallery_extra_data[0]['api_key'];
-				$user_id             = $gallery_extra_data[0]['user_id'];
+				$photoset_id             = $gallery_extra_data[0]['photoset_id'];
 				$flickr_per_page     = $gallery_extra_data[0]['flickr_per_page'];
 				$facebook_user       = $gallery_extra_data[0]['facebook_user'];
 				$facebook_group_name = $gallery_extra_data[0]['facebook_group_name'];
@@ -86,23 +86,23 @@ class rxIsotopeShortcodes{
 					// ========================================================							
 					if($groupName == $flickr_group_name)
 					{
-						$per_page_count = 1;
+						$per_page_count                    = 1;
 						$options_flickr['api_key']         = $api_key;
-						$options_flickr['user_id']         = $user_id;
-						$options_flickr['flickr_per_page'] = intval($flickr_per_page);
-
-						$images_flickr = $this->get_flickr_photostream($options_flickr);
+						$options_flickr['photoset_id']     = $photoset_id;
+						$options_flickr['flickr_per_page'] = intval($flickr_per_page);						
+						
+						$images_flickr                     = $this->getFlickrPhotoSet($options_flickr);
 
 						foreach ($images_flickr as $key => $value) 
 						{							
-							$wdt             = $value['width_m'];
-							$thumbHeight     = $value['height_m'];
-							$thumb_url       = $value['url_m'];
-							$imgFullUrl      = $value['url_o'];
-							$imageCaption    = $value['title'];
+							$wdt             = $value->width_m;
+							$thumbHeight     = $value->height_m;
+							$thumb_url       = $value->url_m;
+							$imgFullUrl      = $value->url_o;
+							$imageCaption    = $value->title;
 							$imageSubCaption = "";
 							$all[]			 = array(								
-								'full'       => $value['url_o'],
+								'full'       => $value->url_o,
 								'caption'    => $imageCaption,
 								'subcaption' => '');
 
@@ -395,12 +395,12 @@ class rxIsotopeShortcodes{
     public function get_flickr_photostream($instance)
     {		
 		$api_key  = $instance['api_key'];
-		$user_id  = $instance['user_id'];
+		$photoset_id  = $instance['photoset_id'];
 		$flickr_per_page = $instance['flickr_per_page'];		
 		$params   = array(
     		'api_key'      => $api_key,
     		'method'       => 'flickr.people.getPhotos',
-    		'user_id'      => $user_id,
+    		'photoset_id'      => $photoset_id,
     		'per_page'     => $flickr_per_page,
     		'content_type' => '7',
     		'extras'	   => 'url_sq, url_o, url_t, url_s, url_m',
@@ -420,6 +420,37 @@ class rxIsotopeShortcodes{
     	// ========================================================
     	return $rsp_obj["photos"]["photo"];
     }  
+
+    /**
+     * Get photos from flickr photoset
+     * @param  array $instance
+     * @return array
+     */
+    public function getFlickrPhotoSet($instance)
+    {
+		$api_key     = $instance['api_key'];
+		$photoset_id = $instance['photoset_id'];
+		$per_page    = intval($instance['flickr_per_page']);
+
+    	$params = array(
+			'api_key'        => $api_key,
+			'method'         => 'flickr.photosets.getPhotos',
+			'per_page'       => $per_page,
+			'photoset_id'    => $photoset_id,
+			'format'         => 'json',
+			'nojsoncallback' => '1',
+			'extras'         => 'url_sq, url_o, url_t, url_s, url_m');
+    	$encoded_params = array();
+    	foreach ($params as $k => $v)
+    	{
+    		$encoded_params[] = urlencode($k).'='.urlencode($v);
+    	}
+		$url = "http://api.flickr.com/services/rest/?".implode('&', $encoded_params);    
+		$rsp = file_get_contents($url);
+		$arr = json_decode($rsp);
+
+		return $arr->photoset->photo;
+    }
 		
 }
 

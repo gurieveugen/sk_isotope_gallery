@@ -82,7 +82,7 @@ class isotopeGalleryCPT extends RXGenericPostType {
 				$lightbox            = $custom_data[0]['lightbox'];												
 				
 				$api_key             = $custom_data[0]['api_key'];	
-				$user_id             = $custom_data[0]['user_id'];	
+				$photoset_id         = $custom_data[0]['photoset_id'];	
 				$flickr_per_page     = $custom_data[0]['flickr_per_page'];	
 				$facebook_user       = $custom_data[0]['facebook_user'];	
 				$facebook_group_name = $custom_data[0]['facebook_group_name'];
@@ -134,7 +134,7 @@ class isotopeGalleryCPT extends RXGenericPostType {
 				<div class="vspace2"></div>                
                 <input id="api_key" name="<?php echo $this->getPostSlug().'-extra_data';?>[api_key]" value="<?php echo $api_key;?>" /><label style="display:block" class="customLabel">Api key</label>                
                 <div class="hLine"></div>
-                <input id="user_id" name="<?php echo $this->getPostSlug().'-extra_data';?>[user_id]" value="<?php echo $user_id;?>" /><label style="display:block" class="customLabel">User id</label>
+                <input id="photoset_id" name="<?php echo $this->getPostSlug().'-extra_data';?>[photoset_id]" value="<?php echo $photoset_id;?>" /><label style="display:block" class="customLabel">Photoset ID</label>
                 <div class="hLine"></div>
                 <input id="flickr_per_page" name="<?php echo $this->getPostSlug().'-extra_data';?>[flickr_per_page]" value="<?php echo $flickr_per_page;?>" /><label style="display:block" class="customLabel">Count images</label>                                 			
                 <div class="hLine"></div>
