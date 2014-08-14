@@ -116,7 +116,7 @@ function RxIsotopeGallery(){
          (selector==".*")?selector="*":null;
          
          rx_gallery_ui.find('.isotopeContainer').toggleClass('variable-sizes').isotope({
-               layoutMode : 'fitRows',
+               layoutMode : 'masonry',
                filter: selector,
                animationOptions: {
                    duration: 750,

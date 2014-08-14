@@ -92,53 +92,56 @@ class rxIsotopeShortcodes{
 						$options_flickr['flickr_per_page'] = intval($flickr_per_page);						
 						
 						$images_flickr                     = $this->getFlickrPhotoSet($options_flickr);
+						if($images_flickr)
+						{
+							foreach ($images_flickr as $key => $value) 
+							{							
+								$wdt             = $value->width_m;
+								$thumbHeight     = $value->height_m;
+								$thumb_url       = $value->url_m;
+								$imgFullUrl      = $value->url_o;
+								$imageCaption    = $value->title;
+								$imageSubCaption = "";
+								$all[]			 = array(								
+									'full'       => $value->url_o,
+									'caption'    => $imageCaption,
+									'subcaption' => '');
 
-						foreach ($images_flickr as $key => $value) 
-						{							
-							$wdt             = $value->width_m;
-							$thumbHeight     = $value->height_m;
-							$thumb_url       = $value->url_m;
-							$imgFullUrl      = $value->url_o;
-							$imageCaption    = $value->title;
-							$imageSubCaption = "";
-							$all[]			 = array(								
-								'full'       => $value->url_o,
-								'caption'    => $imageCaption,
-								'subcaption' => '');
+								if($per_page_count > $per_page) 
+								{
+									$per_page_count = 1;
+								}
+								
+								if(isset($images_layout[$layout_name][$per_page_count]['width']))
+								{
+									$wdt = $images_layout[$layout_name][$per_page_count]['width'];
+								}
 
-							if($per_page_count > $per_page) 
-							{
-								$per_page_count = 1;
+								if(isset($images_layout[$layout_name][$per_page_count]['height']))
+								{
+									$thumbHeight = $images_layout[$layout_name][$per_page_count]['height'];
+								}
+
+								$opts = array(
+									"w"    => $wdt,
+									"h"    => $thumbHeight,
+									"q"    => 100, 
+									"crop" => true );
+
+								$thumb_url = get_image_thumb($imgFullUrl, $opts);
+
+								$isotopeItemsHTML .= '<div style="width: '.$wdt.'px; height: '.$thumbHeight.'px; margin: '.$gap01.'px;" class="isotopeItem _group'.$id_group.' itemm'.$per_page_count.'">
+									<a class="fancybox-thumb" rel="fancybox-thumb" href="'.$imgFullUrl.'" title="'.$imageCaption.'" data-subtitle="'.$imageSubCaption.'">
+										<img class="isotopeThumb" src="'.$thumb_url.'" width="'.$wdt.'" height="'.$thumbHeight.'" />
+										<div class="caption">'.$imageCaption.'</div>
+										<div class="subcaption">'.$imageSubCaption.'</div>
+									</a>																
+								</div>';	
+
+								$per_page_count++;	
 							}
-							
-							if(isset($images_layout[$layout_name][$per_page_count]['width']))
-							{
-								$wdt = $images_layout[$layout_name][$per_page_count]['width'];
-							}
-
-							if(isset($images_layout[$layout_name][$per_page_count]['height']))
-							{
-								$thumbHeight = $images_layout[$layout_name][$per_page_count]['height'];
-							}
-
-							$opts = array(
-								"w"    => $wdt,
-								"h"    => $thumbHeight,
-								"q"    => 100, 
-								"crop" => true );
-
-							$thumb_url = get_image_thumb($imgFullUrl, $opts);
-
-							$isotopeItemsHTML .= '<div style="width: '.$wdt.'px; height: '.$thumbHeight.'px; margin: '.$gap01.'px;" class="isotopeItem _group'.$id_group.' itemm'.$per_page_count.'">
-								<a class="fancybox-thumb" rel="fancybox-thumb" href="'.$imgFullUrl.'" title="'.$imageCaption.'" data-subtitle="'.$imageSubCaption.'">
-									<img class="isotopeThumb" src="'.$thumb_url.'" width="'.$wdt.'" height="'.$thumbHeight.'" />
-									<div class="caption">'.$imageCaption.'</div>
-									<div class="subcaption">'.$imageSubCaption.'</div>
-								</a>																
-							</div>';	
-
-							$per_page_count++;	
 						}
+						
 					}
 
 					// ========================================================
@@ -428,6 +431,9 @@ class rxIsotopeShortcodes{
      */
     public function getFlickrPhotoSet($instance)
     {
+    	$cache = $this->getCache('flickr_photos');
+    	if($cache) return $cache;
+
 		$api_key     = $instance['api_key'];
 		$photoset_id = $instance['photoset_id'];
 		$per_page    = intval($instance['flickr_per_page']);
@@ -445,12 +451,39 @@ class rxIsotopeShortcodes{
     	{
     		$encoded_params[] = urlencode($k).'='.urlencode($v);
     	}
-		$url = "http://api.flickr.com/services/rest/?".implode('&', $encoded_params);    
+		$url = "https://api.flickr.com/services/rest/?".implode('&', $encoded_params);    
 		$rsp = file_get_contents($url);
 		$arr = json_decode($rsp);
+		
+		$this->setCache('flickr_photos', $arr->photoset->photo);
 
 		return $arr->photoset->photo;
     }
+
+    /**
+	 * Set Cache
+	 * @param string  $key    
+	 * @param string  $val    
+	 * @param integer $time   
+	 * @param string  $prefix 
+	 */
+	public function setCache($key, $val, $time = 3600, $prefix = 'cheched-')
+	{		
+		set_transient($prefix.$key, $val, $time);
+	}
+
+	/**
+	 * Get Cache
+	 * @param  string $key    
+	 * @param  string $prefix 
+	 * @return mixed
+	 */
+	public function getCache($key, $prefix = 'cheched-')
+	{		
+		$cached   = get_transient($prefix.$key);
+		if (false !== $cached) return $cached;			
+		return false;
+	}
 		
 }
 
