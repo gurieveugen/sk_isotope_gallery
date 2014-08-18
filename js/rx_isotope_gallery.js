@@ -114,15 +114,20 @@ function RxIsotopeGallery(){
     function filterIsotopeItems(index){
          var selector = "."+isotopeMenu[index].categoryID;
          (selector==".*")?selector="*":null;
-         
-         rx_gallery_ui.find('.isotopeContainer').toggleClass('variable-sizes').isotope({
-               layoutMode : 'masonry',
-               filter: selector,
-               animationOptions: {
-                   duration: 750,
-                   easing: 'linear',
-                   queue: false
-              }});           
+         // rx_gallery_ui.find('.isotopeContainer').isotope({
+         //    masonry: {
+         //      columnWidth: 50
+         //    }
+         //  });    
+         // rx_gallery_ui.find('.isotopeContainer').isotope({
+         //       layoutMode : 'masonry',
+         //       columnWidth: 100,
+         //       filter: selector,
+         //       animationOptions: {
+         //           duration: 750,
+         //           easing: 'linear',
+         //           queue: false
+         //      }});           
     }     
     
 }

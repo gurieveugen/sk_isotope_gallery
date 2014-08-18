@@ -187,7 +187,7 @@ class rxIsotopeShortcodes{
 								"crop" => true );
 
 							$thumb_url = get_image_thumb($imgFullUrl, $opts);
-							
+							//list($wdt, $thumbHeight) = getimagesize($thumb_url);
 
 							$isotopeItemsHTML .= '<div style="width: '.$wdt.'px; height: '.$thumbHeight.'px; margin: '.$gap01.'px;" class="isotopeItem _group'.$id_group.' itemm'.$per_page_count.'">
 								<a class="fancybox-thumb" rel="fancybox-thumb" href="'.$imgFullUrl.'" title="'.$imageCaption.'" data-subtitle="'.$imageSubCaption.'">
@@ -481,7 +481,8 @@ class rxIsotopeShortcodes{
 	public function getCache($key, $prefix = 'cheched-')
 	{		
 		$cached   = get_transient($prefix.$key);
-		if (false !== $cached) return $cached;			
+		if (false !== $cached) return $cached;	
+		
 		return false;
 	}
 		
