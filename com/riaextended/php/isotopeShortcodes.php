@@ -6,6 +6,13 @@ require_once(IISOTOPE_CLASS_PATH.'/com/riaextended/php/libs/rx_resizer.php');
 
 
 class rxIsotopeShortcodes{
+
+	/**
+	 * Temporary fixes
+	 * Customer want some new grid layout
+	 */
+	const G_IMG_WIDTH  = 258;
+	const G_IMG_HEIGHT = 258;
 	
 	public function registerShortcodes(){						
 		add_shortcode('isotope_gallery', array($this, 'rx_isotope_gallery'));																										
@@ -122,7 +129,9 @@ class rxIsotopeShortcodes{
 									$thumbHeight = $images_layout[$layout_name][$per_page_count]['height'];
 								}
 
-								$opts = array(
+								$wdt         = self::G_IMG_WIDTH;
+								$thumbHeight = self::G_IMG_HEIGHT;
+								$opts        = array(
 									"w"    => $wdt,
 									"h"    => $thumbHeight,
 									"q"    => 100, 
@@ -180,7 +189,9 @@ class rxIsotopeShortcodes{
 								$thumbHeight = $images_layout[$layout_name][$per_page_count]['height'];
 							}
 							
-							$opts = array(
+							$wdt         = self::G_IMG_WIDTH;
+							$thumbHeight = self::G_IMG_HEIGHT;
+							$opts        = array(
 								"w"    => $wdt,
 								"h"    => $thumbHeight,
 								"q"    => 100, 
@@ -228,8 +239,8 @@ class rxIsotopeShortcodes{
 							$thumbHeight = $images_layout[$layout_name][$per_page_count]['height'];
 						}
 
-						// $wdt         = 550;
-						// $thumbHeight = 550;
+						$wdt         = self::G_IMG_WIDTH;
+						$thumbHeight = self::G_IMG_HEIGHT;
 						
 							
 						//image full
@@ -295,7 +306,9 @@ class rxIsotopeShortcodes{
 						$thumbHeight = $images_layout[$layout_name][$per_page_count]['height'];
 					}
 					
-					$opts = array(
+					$wdt         = self::G_IMG_WIDTH;
+					$thumbHeight = self::G_IMG_HEIGHT;
+					$opts        = array(
 						"w"    => $wdt,
 						"h"    => $thumbHeight,
 						"q"    => 100, 
