@@ -12,7 +12,7 @@ class rxIsotopeShortcodes{
 	 * Customer want some new grid layout
 	 */
 	const G_IMG_WIDTH  = 258;
-	const G_IMG_HEIGHT = 258;
+	const G_IMG_HEIGHT = 228;
 	
 	public function registerShortcodes(){						
 		add_shortcode('isotope_gallery', array($this, 'rx_isotope_gallery'));																										
@@ -61,7 +61,7 @@ class rxIsotopeShortcodes{
 				$flickr_group_name   = $gallery_extra_data[0]['flickr_group_name'];
 				$layout_name         = $gallery_extra_data[0]['layout_name'];
 				$per_page            = $gallery_extra_data[0]['per_page'];
-				$per_page_count      = 1;
+				$per_page_count      = 1;				
 			}
 			$itemsColor = $menu_back_color;
 			$rgba       = $this->html2rgb($itemsColor);	
@@ -118,19 +118,11 @@ class rxIsotopeShortcodes{
 								{
 									$per_page_count = 1;
 								}
+
+								$sizes       = $this->getWidthHeight($layout_name, $images_layout, $per_page_count);
+								$wdt         = $sizes[0];
+								$thumbHeight = $sizes[1];
 								
-								if(isset($images_layout[$layout_name][$per_page_count]['width']))
-								{
-									$wdt = $images_layout[$layout_name][$per_page_count]['width'];
-								}
-
-								if(isset($images_layout[$layout_name][$per_page_count]['height']))
-								{
-									$thumbHeight = $images_layout[$layout_name][$per_page_count]['height'];
-								}
-
-								$wdt         = self::G_IMG_WIDTH;
-								$thumbHeight = self::G_IMG_HEIGHT;
 								$opts        = array(
 									"w"    => $wdt,
 									"h"    => $thumbHeight,
@@ -179,18 +171,10 @@ class rxIsotopeShortcodes{
 								$per_page_count = 1;
 							}
 							
-							if(isset($images_layout[$layout_name][$per_page_count]['width']))
-							{
-								$wdt = $images_layout[$layout_name][$per_page_count]['width'];
-							}
+							$sizes       = $this->getWidthHeight($layout_name, $images_layout, $per_page_count);
+							$wdt         = $sizes[0];
+							$thumbHeight = $sizes[1];
 
-							if(isset($images_layout[$layout_name][$per_page_count]['height']))
-							{
-								$thumbHeight = $images_layout[$layout_name][$per_page_count]['height'];
-							}
-							
-							$wdt         = self::G_IMG_WIDTH;
-							$thumbHeight = self::G_IMG_HEIGHT;
 							$opts        = array(
 								"w"    => $wdt,
 								"h"    => $thumbHeight,
@@ -198,6 +182,7 @@ class rxIsotopeShortcodes{
 								"crop" => true );
 
 							$thumb_url = get_image_thumb($imgFullUrl, $opts);
+							//var_dump($imgFullUrl, $thumb_url);
 							//list($wdt, $thumbHeight) = getimagesize($thumb_url);
 
 							$isotopeItemsHTML .= '<div style="width: '.$wdt.'px; height: '.$thumbHeight.'px; margin: '.$gap01.'px;" class="isotopeItem _group'.$id_group.' itemm'.$per_page_count.'">
@@ -229,18 +214,9 @@ class rxIsotopeShortcodes{
 							$per_page_count = 1;
 						}
 						
-						if(isset($images_layout[$layout_name][$per_page_count]['width']))
-						{
-							$wdt = $images_layout[$layout_name][$per_page_count]['width'];
-						}
-
-						if(isset($images_layout[$layout_name][$per_page_count]['height']))
-						{
-							$thumbHeight = $images_layout[$layout_name][$per_page_count]['height'];
-						}
-
-						$wdt         = self::G_IMG_WIDTH;
-						$thumbHeight = self::G_IMG_HEIGHT;
+						$sizes       = $this->getWidthHeight($layout_name, $images_layout, $per_page_count);
+						$wdt         = $sizes[0];
+						$thumbHeight = $sizes[1];
 						
 							
 						//image full
@@ -296,18 +272,10 @@ class rxIsotopeShortcodes{
 						$per_page_count = 1;
 					}
 					
-					if(isset($images_layout[$layout_name][$per_page_count]['width']))
-					{
-						$wdt = $images_layout[$layout_name][$per_page_count]['width'];
-					}
+					$sizes       = $this->getWidthHeight($layout_name, $images_layout, $per_page_count);
+					$wdt         = $sizes[0];
+					$thumbHeight = $sizes[1];
 
-					if(isset($images_layout[$layout_name][$per_page_count]['height']))
-					{
-						$thumbHeight = $images_layout[$layout_name][$per_page_count]['height'];
-					}
-					
-					$wdt         = self::G_IMG_WIDTH;
-					$thumbHeight = self::G_IMG_HEIGHT;
 					$opts        = array(
 						"w"    => $wdt,
 						"h"    => $thumbHeight,
@@ -378,14 +346,40 @@ class rxIsotopeShortcodes{
 				
 				$return_val .= '</div>';
 				
-			}else{
+			}
+			else
+			{
 				$return_val = 'gallery meta data not found';
 			}
-		}else{
+		}
+		else
+		{
 			$return_val = 'gallery not found';
 		}
 				
 		return $return_val;		
+	}
+
+	private function getWidthHeight($layout_name, $images_layout, $per_page_count)
+	{
+		if($layout_name == 'amenities')
+		{
+			if(isset($images_layout[$layout_name][$per_page_count]['width']))
+			{
+				$wdt = $images_layout[$layout_name][$per_page_count]['width'];
+			}
+
+			if(isset($images_layout[$layout_name][$per_page_count]['height']))
+			{
+				$thumbHeight = $images_layout[$layout_name][$per_page_count]['height'];
+			}	
+		}
+		else
+		{
+			$wdt         = self::G_IMG_WIDTH;
+			$thumbHeight = self::G_IMG_HEIGHT;
+		}
+		return array($wdt, $thumbHeight);
 	}
 	
 	//utils - convert hex to rgb	
@@ -507,8 +501,9 @@ class rxIsotopeShortcodes{
 * @param string url or path to image
 * @return string
 */
-function get_extension( $src ) {
-
+function get_extension( $src ) {	
+	$src = explode('?', $src);
+	$src = $src[0];	
     $type = wp_check_filetype( $src );
 
     return ( isset( $type[ "ext" ] ) ) ? $type[ "ext" ] : false;
@@ -534,7 +529,7 @@ function get_image_thumb( $src, $opts = null ) {
         "w" => PHP_INT_MAX, // Won't resize if image width is smaller than default width
         "h" => PHP_INT_MAX, // Won't resize if image height is smaller than default height
         "q" => 95,
-        "crop" => false
+        "crop" => true
     );
 
     //
@@ -571,18 +566,19 @@ function get_image_thumb( $src, $opts = null ) {
 
     // Crop
     $crop = ( isset( $crop ) && $crop ) ? $crop : $defaults[ "crop" ];
-
+ 	$crop = true;
+    //$h = 9999;
     // Generate Unique Cache file
-    $cache = md5( $src . "$w-$h-$q-$crop" );
+    $cache = md5( $src . "$w-$h-$q-$crop-gc" );
     
     // WordPress uploads directory (works with multi-site)
     $uploads = wp_upload_dir();
 
     // Cache directory path
-    $cache_dir = $uploads[ "basedir" ] . "/2013/00";
+    $cache_dir = $uploads[ "basedir" ] . "/2014/00";
 
     // Reset the default thumbnail url, in case it's cached.
-    $thumb_url = $uploads[ "baseurl" ] . "/2013/00/$cache.$ext";
+    $thumb_url = $uploads[ "baseurl" ] . "/2014/00/$cache.$ext";
     
     // Thumbnail physical directory
     $thumb_dir = $cache_dir;
@@ -598,7 +594,7 @@ function get_image_thumb( $src, $opts = null ) {
         mkdir( $cache_dir, 0744, true );
     }
 
-
+    //var_dump(is_file( $thumb_file ), $thumb_file.$src);
     //
     // Check to see if the file is cached. If not, generate the resized file.
     //
